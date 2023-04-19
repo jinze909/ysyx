@@ -1,0 +1,57 @@
+#include "verilated.h"
+#include "verilated_vcd_c.h"
+#include "obj_dir/VFulladderN.h"
+
+VerilatedContext* contextp = NULL;
+VerilatedVcdC* tfp = NULL;
+
+static VFulladderN* top;
+
+void step_and_dump_wave(){
+  top->eval();
+  contextp->timeInc(1);
+  tfp->dump(contextp->time());
+}
+void sim_init(){
+  contextp = new VerilatedContext;
+  tfp = new VerilatedVcdC;
+  top = new VFulladderN;
+  contextp->traceEverOn(true);
+  top->trace(tfp, 0);
+  tfp->open("dump.vcd");
+}
+
+void sim_exit(){
+  step_and_dump_wave();
+  tfp->close();
+}
+
+int main() {
+  sim_init();
+  
+  top -> in_x = 0b1111111111111111111111111111111100000000000000000000000000000000;
+  top -> in_y = 0b0000000000000000000000000000000011111111111111111111111111111111;
+  step_and_dump_wave();
+  
+  top -> in_x = 0b1111111111111111000000000000000011111111111111110000000000000000;
+  top -> in_y = 0b0000000000000000111111111111111100000000000000001111111111111111;
+  step_and_dump_wave();
+  
+  top -> in_x = 0b1111111100000000111111110000000011111111000000001111111100000000;
+  top -> in_y = 0b0000000011111111000000001111111100000000111111110000000011111111;
+  step_and_dump_wave();
+  
+  top -> in_x = 0b1111000011110000111100001111000011110000111100001111000011110000;
+  top -> in_y = 0b0000111100001111000011110000111100001111000011110000111100001111;
+  step_and_dump_wave();
+  
+  top -> in_x = 0b1100110011001100110011001100110011001100110011001100110011001100;
+  top -> in_y = 0b0011001100110011001100110011001100110011001100110011001100110011;
+  step_and_dump_wave();
+  
+  top -> in_x = 0b1010101010101010101010101010101010101010101010101010101010101010;
+  top -> in_y = 0b0101010101010101010101010101010101010101010101010101010101010101;
+  step_and_dump_wave();
+  
+  sim_exit();
+}
